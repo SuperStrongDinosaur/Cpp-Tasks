@@ -33,6 +33,13 @@ big_integer::big_integer(std::string const &str) {
 		*this = -*this;
 }
 
+big_integer::big_integer(big_integer const &other) {
+	this->data = other.data;
+	this->sign = other.sign;
+}
+
+big_integer::~big_integer() {}
+
 big_integer &big_integer::operator=(big_integer const &other) {
 	this->data = other.data;
 	this->sign = other.sign;
