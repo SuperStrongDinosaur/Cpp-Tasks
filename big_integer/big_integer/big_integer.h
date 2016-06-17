@@ -12,7 +12,6 @@ public:
 	big_integer(big_integer const &other);
 	~big_integer();
 
-
 	big_integer &operator=(big_integer const &other);
 	big_integer &operator+=(big_integer const &rhs);
 	big_integer &operator-=(big_integer const &rhs);
