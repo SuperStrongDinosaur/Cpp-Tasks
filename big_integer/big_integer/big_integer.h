@@ -50,7 +50,7 @@ private:
 	inline void flip_bytes(big_integer &a);
 	inline void make_zero();
 	inline void remove_leading_zeros();
-	big_integer &abstractLogicOperation(big_integer &a, big_integer b, uint32_t(*logicFunc)(uint32_t, uint32_t), bool(*check)(bool, bool));
+	big_integer &abstract_operation(big_integer &a, big_integer b, uint32_t(*logicFunc)(uint32_t, uint32_t), bool(*check)(bool, bool));
 	big_integer mul(big_integer const &b, uint32_t x);
 	int big_integer::compare_abs(big_integer const& a, big_integer const& b);
 };

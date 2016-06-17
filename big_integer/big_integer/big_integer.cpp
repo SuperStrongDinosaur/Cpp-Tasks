@@ -47,38 +47,33 @@ big_integer &big_integer::operator=(big_integer const &other) {
 }
 
 big_integer &big_integer::operator+=(big_integer const &rhs) {
-	big_integer t = rhs;
-	if (sign == t.sign) {
+	big_integer b = rhs, a = *this;
+	if (a.sign == b.sign) {
 		uint32_t carry = 0;
 		int64_t cur = 0;
-		for (size_t i = 0; i < std::max(data.size(), t.data.size()) || carry; i++) {
-			if (i == data.size())
-				data.push_back(0);
-			cur = static_cast<int64_t>(data[i]) + static_cast<int64_t>(carry) + static_cast<int64_t>((i < t.data.size() ? t.data[i] : 0));
-			data[i] = static_cast<uint32_t>(cur % BASE);
+		for (size_t i = 0; i < std::max(a.data.size(), b.data.size()) || carry; i++) {
+			if (i == a.data.size())
+				a.data.push_back(0);
+			cur = static_cast<int64_t>(a.data[i]) + static_cast<int64_t>(carry) + static_cast<int64_t>((i < b.data.size() ? b.data[i] : 0));
+			a.data[i] = static_cast<uint32_t>(cur % BASE);
 			carry = static_cast<uint32_t>(cur / BASE);
 		}
 	}
 	else {
-		bool saveSign = sign;
-		sign = true;
-		t.sign = true;
-		bool newSign;
-		if (*this > t) 
-			newSign = saveSign;
-		else 
-			newSign = !saveSign;
-		*this -= t;
-		sign = newSign;
+		if (compare_abs(a, b) < 0)
+			sign = !sign;
+		a.sign = true;
+		b.sign = true;
+		a -= b;
 	}
+	this->data = a.data;
 	this->make_zero();
 	return *this;
 }
 
 big_integer &big_integer::operator-=(big_integer const &rhs) {
-	big_integer a = *this;
+	big_integer a = *this, b = rhs;
 	a.sign = true;
-	big_integer b = rhs;
 	b.sign = true;
 	if (this->sign == rhs.sign) {
 		if (a < b)
@@ -144,40 +139,38 @@ big_integer & big_integer::operator/=(big_integer const & rhs) {
 		while (rhs.data.back() * normalize < static_cast<uint32_t>(BASE / 2))
 			normalize *= 2;
 	}
-	big_integer A = mul(*this, normalize);
-	big_integer B = mul(rhs, normalize);
-	bool sign = A.sign ^ !B.sign;
-	A.sign = true;
-	B.sign = true;
-	size_t n = B.data.size();
-	size_t m = A.data.size() - n;
-	B <<= static_cast<int>(m * basepow);
-	std::vector<uint32_t> q(m);
-	if (compare_abs(A, B) >= 0) {
-		q.push_back(1);
-		A -= B;
+	big_integer a = mul(*this, normalize), b = mul(rhs, normalize);
+	bool sign = a.sign ^ !b.sign;
+	a.sign = true;
+	b.sign = true;
+	size_t n = b.data.size();
+	size_t m = a.data.size() - n;
+	b <<= static_cast<int>(m * basepow);
+	std::vector<uint32_t> res(m);
+	if (compare_abs(a, b) >= 0) {
+		res.push_back(1);
+		a -= b;
 	}
 	for (size_t i = m - 1; i >= 0; i--) {
-		if (A.data[0] == 0 && A.data.size() == 1) 
+		if (a.data[0] == 0 && a.data.size() == 1) 
 			break;
-		B >>= basepow;
-		uint64_t q_tmp = (A.data[n + i] * BASE + A.data[n + i - 1]) / B.data.back();
-		q[i] = static_cast<uint32_t>(std::min(q_tmp, BASE - static_cast<uint64_t>(1)));
-		A -= mul(B, q[i]);
-		while (!A.sign) {
-			q[i]--;
-			A += B;
+		b >>= basepow;
+		res[i] = static_cast<uint32_t>(std::min(((a.data[n + i] * BASE + a.data[n + i - 1]) / b.data.back()), BASE - static_cast<uint64_t>(1)));
+		a -= mul(b, res[i]);
+		while (!a.sign) {
+			res[i]--;
+			a += b;
 		}
 	}
-	this->data = q;
+	this->data = res;
 	this->sign = sign;
 	return *this;
 }
 
 big_integer &big_integer::operator%=(big_integer const &rhs) {  return *this -= (*this / rhs) * rhs; }
-big_integer &big_integer::operator&=(big_integer const &rhs) { return abstractLogicOperation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a & b; }, [](bool x, bool y) -> bool { return x & y; }); }
-big_integer &big_integer::operator|=(big_integer const &rhs) { return abstractLogicOperation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a | b; }, [](bool x, bool y) -> bool { return x | y; }); }
-big_integer &big_integer::operator^=(big_integer const &rhs) { return abstractLogicOperation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a ^ b; }, [](bool x, bool y) -> bool { return x ^ y; }); }
+big_integer &big_integer::operator&=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a & b; }, [](bool x, bool y) -> bool { return x & y; }); }
+big_integer &big_integer::operator|=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a | b; }, [](bool x, bool y) -> bool { return x | y; }); }
+big_integer &big_integer::operator^=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a ^ b; }, [](bool x, bool y) -> bool { return x ^ y; }); }
 
 big_integer &big_integer::operator<<=(int rhs)
 {
@@ -193,13 +186,13 @@ big_integer &big_integer::operator<<=(int rhs)
 
 big_integer &big_integer::operator>>=(int rhs) {
 	std::reverse(this->data.begin(), this->data.end());
-	bool thissigne = sign;
+	bool temp_signe = sign;
 	for (int i = 0; i < rhs / basepow; i++) 
 		this->data.pop_back();
 	std::reverse(this->data.begin(), this->data.end());
 	for (int i = 0; i < rhs % basepow; i++) 
 		*this /= 2;
-	if (!thissigne) 
+	if (!temp_signe)
 		*this -= 1;
 	this->remove_leading_zeros();
 	return *this;
@@ -243,17 +236,17 @@ bool operator!=(big_integer const &a, big_integer const &b) { return !(a == b); 
 bool operator>(big_integer const &a, big_integer const &b) {
 	if (a.sign == b.sign) {
 		if (!a.sign) {
-			big_integer pb = b;
-			pb.sign = true;
-			big_integer pa = a;
-			pa.sign = true;
-			if (pb.compare_abs(pb, pa) > 0)
+			big_integer temp_b = b;
+			temp_b.sign = true;
+			big_integer temp_a = a;
+			temp_a.sign = true;
+			if (temp_b.compare_abs(temp_b, temp_a) > 0)
 				return true;
 			return false;
 		}
 		else {
-			big_integer pb = b;
-			if (pb.compare_abs(a, b) > 0)
+			big_integer temp_b = b;
+			if (temp_b.compare_abs(a, b) > 0)
 				return true;
 			return false;
 		}
@@ -297,7 +290,7 @@ inline void  big_integer::flip_bytes(big_integer &a) {
 		a.data[i] = (~(a.data[i]) & static_cast<uint32_t>(BASE - 1));
 }
 
-big_integer  &big_integer::abstractLogicOperation(big_integer &a, big_integer b, uint32_t(*logicFunc)(uint32_t, uint32_t), bool(*check)(bool, bool)) {
+big_integer  &big_integer::abstract_operation(big_integer &a, big_integer b, uint32_t(*logicFunc)(uint32_t, uint32_t), bool(*check)(bool, bool)) {
 	bool a_sign = a.sign;
 	bool b_sign = b.sign;
 	if (!a.sign) {
