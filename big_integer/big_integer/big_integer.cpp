@@ -207,9 +207,17 @@ big_integer big_integer::operator-() const {
 
 big_integer big_integer::operator~() const { return (-*this) - 1; }
 big_integer &big_integer::operator++() { return *this += 1; }
-big_integer big_integer::operator++(int) { return *this += 1; }
+big_integer big_integer::operator++(int) { 
+	big_integer temp = *this;
+	*this += 1;
+	return temp;
+}
 big_integer &big_integer::operator--() { return *this -= 1; }
-big_integer big_integer::operator--(int) { return *this -= 1; }
+big_integer big_integer::operator--(int) {
+	big_integer temp = *this;
+	*this -= 1;
+	return temp;
+}
 
 big_integer operator+(big_integer a, big_integer const &b) { return a += b; }
 big_integer operator-(big_integer a, big_integer const &b) { return a -= b; }
