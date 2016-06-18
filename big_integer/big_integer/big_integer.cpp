@@ -1,15 +1,8 @@
 #include "big_integer.h"
 #include <algorithm>
 
-big_integer::big_integer() {
-	data = std::vector<uint32_t>(1);
-	sign = true;
-}
-
-big_integer::big_integer(int a) {
-	if (a == 0) 
-		*this = big_integer();
-	else {
+big_integer::big_integer(int a): big_integer() {
+	if(a != 0) {
 		data = std::vector<uint32_t>(1);
 		if (a > 0) {
 			sign = true;
@@ -17,25 +10,18 @@ big_integer::big_integer(int a) {
 		}
 		else {
 			sign = false;
-			data[0] = -a;
+			data[0] = static_cast<uint32_t>(-static_cast<int64_t>(a));
 		}
 	}
 }
 
-big_integer::big_integer(std::string const &str) {
-	size_t start = 0;
-	*this = big_integer(0);
+big_integer::big_integer(std::string const &str) : big_integer() {
 	for (size_t i = (str[0] == '-' ? 1 : 0); i < str.size(); i++) {
 		*this *= 10;
 		*this += (str[i] - '0');
 	}
 	if (str[0] == '-') 
 		*this = -*this;
-}
-
-big_integer::big_integer(big_integer const &other) {
-	this->data = other.data;
-	this->sign = other.sign;
 }
 
 big_integer::~big_integer() {}
@@ -350,7 +336,7 @@ big_integer big_integer::mul(big_integer const &b, uint32_t x) {
 	big_integer a = b;
 	a.data.push_back(0);
 	for (size_t i = 0; i < a.data.size() || carry; i++) {
-		int64_t cur = carry + static_cast<int64_t>(a.data[i]) * x;
+		uint64_t cur = carry + static_cast<uint64_t>(a.data[i]) * x;
 		a.data[i] = static_cast<uint32_t>(cur % BASE);
 		carry = static_cast<uint32_t>(cur / BASE);
 	}

@@ -6,10 +6,10 @@
 
 class big_integer {
 public:
-	big_integer();
+	big_integer() : data(std::vector<uint32_t>(1)), sign(true) {}
 	big_integer(int a);
 	explicit big_integer(std::string const &str);
-	big_integer(big_integer const &other);
+	big_integer(big_integer const &other) : data(other.data), sign(other.sign) {}
 	~big_integer();
 
 	big_integer &operator=(big_integer const &other);
