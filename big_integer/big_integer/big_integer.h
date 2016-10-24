@@ -3,10 +3,11 @@
 
 #include <string>
 #include <vector>
+#include "my_vec.h"
 
 class big_integer {
 public:
-	big_integer() : data(std::vector<uint32_t>(1)), sign(true) {}
+	big_integer() : data(1), sign(true) {}
 	big_integer(int a);
 	explicit big_integer(std::string const &str);
 	big_integer(big_integer const &other) : data(other.data), sign(other.sign) {}
@@ -42,7 +43,7 @@ public:
 	friend std::string to_string(big_integer const &a);
 
 private:
-	std::vector<uint32_t> data;
+	my_vec data;
 	bool sign;
 	const static uint64_t BASE = static_cast<uint64_t>(UINT32_MAX) + 1;
 	const int basepow = 32;

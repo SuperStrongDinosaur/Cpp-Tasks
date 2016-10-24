@@ -124,10 +124,13 @@
     <ClCompile Include="big_integer_testing.cpp" />
     <ClCompile Include="gtest-all.cc" />
     <ClCompile Include="gtest_main.cc" />
+    <ClCompile Include="my_vec.cpp" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="big_integer.h" />
     <ClInclude Include="gtest.h" />
+    <ClInclude Include="my_vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

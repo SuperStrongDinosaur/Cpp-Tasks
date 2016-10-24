@@ -19,12 +19,18 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="big_integer_testing.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gtest_main.cc">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gtest-all.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="my_vec.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,6 +39,9 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="gtest.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="my_vec.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>

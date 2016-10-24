@@ -3,7 +3,7 @@
 
 big_integer::big_integer(int a): big_integer() {
 	if(a != 0) {
-		data = std::vector<uint32_t>(1);
+		data = my_vec(1);
 		if (a > 0) {
 			sign = true;
 			data[0] = a;
@@ -132,7 +132,7 @@ big_integer & big_integer::operator/=(big_integer const & rhs) {
 	size_t n = b.data.size();
 	size_t m = a.data.size() - n;
 	b <<= static_cast<int>(m * basepow);
-	std::vector<uint32_t> res(m);
+	my_vec res(m);
 	if (compare_abs(a, b) >= 0) {
 		res.push_back(1);
 		a -= b;
@@ -160,10 +160,12 @@ big_integer &big_integer::operator^=(big_integer const &rhs) { return abstract_o
 
 big_integer &big_integer::operator<<=(int rhs)
 {
-	std::reverse(this->data.begin(), this->data.end());
+	data.reverse();
+//	std::reverse(this->data.begin(), this->data.end());
 	for (int i = 0; i < rhs / basepow; i++) 
 		this->data.push_back(0);
-	std::reverse(this->data.begin(), this->data.end());
+	data.reverse();
+//	std::reverse(this->data.begin(), this->data.end());
 	for (int i = 0; i < rhs % basepow; i++)
 		*this *= 2;
 	this->remove_leading_zeros();
@@ -171,11 +173,13 @@ big_integer &big_integer::operator<<=(int rhs)
 }
 
 big_integer &big_integer::operator>>=(int rhs) {
-	std::reverse(this->data.begin(), this->data.end());
+	data.reverse();
+//	std::reverse(this->data.begin(), this->data.end());
 	bool temp_signe = sign;
 	for (int i = 0; i < rhs / basepow; i++) 
 		this->data.pop_back();
-	std::reverse(this->data.begin(), this->data.end());
+	data.reverse();
+//	std::reverse(this->data.begin(), this->data.end());
 	for (int i = 0; i < rhs % basepow; i++) 
 		*this /= 2;
 	if (!temp_signe)
