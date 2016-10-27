@@ -1,8 +1,8 @@
 #include "big_integer.h"
 #include <algorithm>
 
-big_integer::big_integer(int a): big_integer() {
-	if(a != 0) {
+big_integer::big_integer(int a) : big_integer() {
+	if (a != 0) {
 		data = my_vec(1);
 		if (a > 0) {
 			sign = true;
@@ -20,7 +20,7 @@ big_integer::big_integer(std::string const &str) : big_integer() {
 		*this *= 10;
 		*this += (str[i] - '0');
 	}
-	if (str[0] == '-') 
+	if (str[0] == '-')
 		*this = -*this;
 }
 
@@ -53,7 +53,7 @@ big_integer &big_integer::operator+=(big_integer const &rhs) {
 		a -= b;
 	}
 	this->data = a.data;
-	this->make_zero();
+	make_zero();
 	return *this;
 }
 
@@ -73,12 +73,11 @@ big_integer &big_integer::operator-=(big_integer const &rhs) {
 			a.data[i] = static_cast<uint32_t>(cur);
 		}
 		a.remove_leading_zeros();
-		if (compare_abs(*this, rhs) > 0) 
-			sign = this->sign;
-		else 
+		if (compare_abs(*this, rhs) > 0);
+		else
 			sign = !this->sign;
 	}
-	else 
+	else
 		a += b;
 	this->data = a.data;
 	this->make_zero();
@@ -138,7 +137,7 @@ big_integer & big_integer::operator/=(big_integer const & rhs) {
 		a -= b;
 	}
 	for (size_t i = m - 1; i >= 0; i--) {
-		if (a.data[0] == 0 && a.data.size() == 1) 
+		if (a.data[0] == 0 && a.data.size() == 1)
 			break;
 		b >>= basepow;
 		res[i] = static_cast<uint32_t>(std::min(((a.data[n + i] * BASE + a.data[n + i - 1]) / b.data.back()), BASE - static_cast<uint64_t>(1)));
@@ -153,7 +152,7 @@ big_integer & big_integer::operator/=(big_integer const & rhs) {
 	return *this;
 }
 
-big_integer &big_integer::operator%=(big_integer const &rhs) {  return *this -= (*this / rhs) * rhs; }
+big_integer &big_integer::operator%=(big_integer const &rhs) { return *this -= (*this / rhs) * rhs; }
 big_integer &big_integer::operator&=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a & b; }, [](bool x, bool y) -> bool { return x & y; }); }
 big_integer &big_integer::operator|=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a | b; }, [](bool x, bool y) -> bool { return x | y; }); }
 big_integer &big_integer::operator^=(big_integer const &rhs) { return abstract_operation(*this, big_integer(rhs), [](uint32_t a, uint32_t b) -> uint32_t { return a ^ b; }, [](bool x, bool y) -> bool { return x ^ y; }); }
@@ -161,11 +160,11 @@ big_integer &big_integer::operator^=(big_integer const &rhs) { return abstract_o
 big_integer &big_integer::operator<<=(int rhs)
 {
 	data.reverse();
-//	std::reverse(this->data.begin(), this->data.end());
-	for (int i = 0; i < rhs / basepow; i++) 
+	//	std::reverse(this->data.begin(), this->data.end());
+	for (int i = 0; i < rhs / basepow; i++)
 		this->data.push_back(0);
 	data.reverse();
-//	std::reverse(this->data.begin(), this->data.end());
+	//	std::reverse(this->data.begin(), this->data.end());
 	for (int i = 0; i < rhs % basepow; i++)
 		*this *= 2;
 	this->remove_leading_zeros();
@@ -174,13 +173,13 @@ big_integer &big_integer::operator<<=(int rhs)
 
 big_integer &big_integer::operator>>=(int rhs) {
 	data.reverse();
-//	std::reverse(this->data.begin(), this->data.end());
+	//	std::reverse(this->data.begin(), this->data.end());
 	bool temp_signe = sign;
-	for (int i = 0; i < rhs / basepow; i++) 
+	for (int i = 0; i < rhs / basepow; i++)
 		this->data.pop_back();
 	data.reverse();
-//	std::reverse(this->data.begin(), this->data.end());
-	for (int i = 0; i < rhs % basepow; i++) 
+	//	std::reverse(this->data.begin(), this->data.end());
+	for (int i = 0; i < rhs % basepow; i++)
 		*this /= 2;
 	if (!temp_signe)
 		*this -= 1;
@@ -197,7 +196,7 @@ big_integer big_integer::operator-() const {
 
 big_integer big_integer::operator~() const { return (-*this) - 1; }
 big_integer &big_integer::operator++() { return *this += 1; }
-big_integer big_integer::operator++(int) { 
+big_integer big_integer::operator++(int) {
 	big_integer temp = *this;
 	*this += 1;
 	return temp;
@@ -218,10 +217,10 @@ big_integer operator&(big_integer a, big_integer const &b) { return a &= b; }
 big_integer operator|(big_integer a, big_integer const &b) { return a |= b; }
 big_integer operator^(big_integer a, big_integer const &b) { return a ^= b; }
 big_integer operator<<(big_integer a, int b) { return a <<= b; }
-big_integer operator>>(big_integer a, int b) { return a >>= b; }
+big_integer operator >> (big_integer a, int b) { return a >>= b; }
 
 bool operator==(big_integer const &a, big_integer const &b) {
-	if (a.sign == b.sign) 
+	if (a.sign == b.sign)
 		if (a.data.size() == b.data.size()) {
 			for (size_t i = 0; i < a.data.size(); i++)
 				if (a.data[i] != b.data[i]) return false;
@@ -258,7 +257,7 @@ bool operator>=(big_integer const &a, big_integer const &b) { return (a > b) || 
 
 std::string to_string(big_integer const &a) {
 	std::string s;
-	if (!a.sign) 
+	if (!a.sign)
 		s += '-';
 	big_integer b = a;
 	b.sign = true;
@@ -271,7 +270,7 @@ std::string to_string(big_integer const &a) {
 		b /= 10;
 	}
 	std::reverse(ans.begin(), ans.end());
-	for (size_t i = 0; i < ans.size(); i++) 
+	for (size_t i = 0; i < ans.size(); i++)
 		s += std::to_string(ans[i]);
 	return s;
 }
@@ -279,7 +278,7 @@ std::string to_string(big_integer const &a) {
 std::ostream &operator<<(std::ostream &s, big_integer const &a) { return s << to_string(a); }
 
 inline void big_integer::remove_leading_zeros() {
-	while (this->data.size() != 1 && !this->data.back()) 
+	while (this->data.size() != 1 && !this->data.back())
 		this->data.pop_back();
 }
 
@@ -350,9 +349,8 @@ big_integer big_integer::mul(big_integer const &b, uint32_t x) {
 }
 
 inline void big_integer::make_zero() {
-	if (data.size() == 0) data.push_back(0);
+	if (data.size() == 0)
+		data.push_back(0);
 	if (data.size() == 1 && data[0] == 0)
 		sign = true;
 }
-
-

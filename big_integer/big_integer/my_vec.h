@@ -1,5 +1,5 @@
 #ifndef MY_VEC_H
-#define ME_VEC_H
+#define MY_VEC_H
 
 #include <vector>
 #include <memory>
@@ -18,9 +18,9 @@ struct my_vec {
 
 	uint32_t back() const;
 	size_t size() const;
-	void resize(const size_t  sz);
+	void resize(const size_t sz);
 
-	uint32_t operator[] (size_t index) const;
+	uint32_t& operator[] (size_t index) const;
 	uint32_t& operator[] (size_t index);
 
 	void reverse();
@@ -28,7 +28,7 @@ struct my_vec {
 private:
 
 	union saved_data {
-		uint32_t  val;
+		uint32_t val;
 		std::vector<uint32_t>* vals;
 	};
 

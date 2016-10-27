@@ -2,7 +2,6 @@
 #define BIGINT_BIG_INTEGER_H
 
 #include <string>
-#include <vector>
 #include "my_vec.h"
 
 class big_integer {
@@ -53,7 +52,7 @@ private:
 	inline void remove_leading_zeros();
 	big_integer &abstract_operation(big_integer &a, big_integer b, uint32_t(*logicFunc)(uint32_t, uint32_t), bool(*check)(bool, bool));
 	big_integer mul(big_integer const &b, uint32_t x);
-	int big_integer::compare_abs(big_integer const& a, big_integer const& b);
+	int compare_abs(big_integer const& a, big_integer const& b);
 };
 
 big_integer operator+(big_integer a, big_integer const &b);
@@ -65,7 +64,7 @@ big_integer operator&(big_integer a, big_integer const &b);
 big_integer operator|(big_integer a, big_integer const &b);
 big_integer operator^(big_integer a, big_integer const &b);
 big_integer operator<<(big_integer a, int b);
-big_integer operator>>(big_integer a, int b);
+big_integer operator >> (big_integer a, int b);
 bool operator==(big_integer const &a, big_integer const &b);
 bool operator!=(big_integer const &a, big_integer const &b);
 bool operator<(big_integer const &a, big_integer const &b);
