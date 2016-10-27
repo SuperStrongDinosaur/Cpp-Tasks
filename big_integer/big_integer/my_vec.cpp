@@ -95,7 +95,7 @@ void my_vec::resize(size_t len) {
 	correct();
 }
 
-uint32_t& my_vec::operator[](size_t index) const {
+uint32_t my_vec::operator[](size_t index) const {
 	if (sz == 1)
 		return data->val;
 	return (*data->vals)[index];

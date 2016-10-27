@@ -20,7 +20,7 @@ struct my_vec {
 	size_t size() const;
 	void resize(const size_t sz);
 
-	uint32_t& operator[] (size_t index) const;
+	uint32_t operator[] (size_t index) const;
 	uint32_t& operator[] (size_t index);
 
 	void reverse();
