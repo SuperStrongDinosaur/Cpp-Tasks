@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClInclude Include="big_integer.h" />
     <ClInclude Include="gtest.h" />
+    <ClInclude Include="gtest_main.h" />
     <ClInclude Include="my_vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

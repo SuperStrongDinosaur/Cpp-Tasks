@@ -647,7 +647,9 @@ namespace
 
 TEST(correctness, mul_merge_randomized)
 {
-	for (unsigned itn = 0; itn != number_of_iterations; ++itn) {
+	for (unsigned itn = 0; itn != number_of_iterations; ++itn) 
+//	while(true)
+	{
 		std::vector<big_integer> x;
 		for (size_t i = 0; i != number_of_multipliers; ++i)
 			x.push_back(myrand());
@@ -657,4 +659,6 @@ TEST(correctness, mul_merge_randomized)
 
 		EXPECT_TRUE(a == b);
 	}
+//	int n = 0;
+//	n = n;
 }

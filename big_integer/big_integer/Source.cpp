@@ -1,23 +1,23 @@
-#include "my_vec.h"
-#include <iostream>
+
+#include "big_integer.h"
 
 using namespace std;
 
-void print(my_vec& a) {
-	for (int i = 0; i < a.size(); i++)
-		cout << a[i] << " ";
-	cout << endl;
-}
+int number_of_iterations = 100;
 
 /*int main() {
-	my_vec a;
-	for (int i = 0; i < 10; i++) {
-		a.push_back(i);
-		print(a);
-	}
-	for (int i = 0; i < 10; i++) {
-		a.pop_back();
-		print(a);
+	for (unsigned itn = 0; itn != number_of_iterations; ++itn) {
+		std::vector<big_integer> x;
+		for (size_t i = 0; i != number_of_iterations; ++i)
+			x.push_back(rand());
+
+
+		for (size_t i = 0; i != number_of_iterations; ++i)
+			x[0] *= x[i];
+
+		for (auto i : lol)
+			cout << i.second << endl;
+
 	}
 	return 0;
 }*/

@@ -4,8 +4,9 @@
 #include <vector>
 #include <memory>
 
-struct my_vec {
+using namespace std;
 
+struct my_vec {
 	my_vec();
 	my_vec(size_t sz);
 	my_vec(const my_vec& other);
@@ -18,25 +19,18 @@ struct my_vec {
 
 	uint32_t back() const;
 	size_t size() const;
-	void resize(const size_t sz);
+	void resize(const size_t size);
 
 	uint32_t operator[] (size_t index) const;
 	uint32_t& operator[] (size_t index);
-
 	void reverse();
 
 private:
-
-	union saved_data {
-		uint32_t val;
-		std::vector<uint32_t>* vals;
-	};
-
-	std::shared_ptr<saved_data> data;
+	uint32_t val;
+	shared_ptr<vector<uint32_t>> vals;
 	size_t sz;
-	void correct();
+
 	void make_own();
 };
-
 
 #endif

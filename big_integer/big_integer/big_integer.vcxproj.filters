@@ -44,5 +44,8 @@
     <ClInclude Include="my_vec.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="gtest_main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
