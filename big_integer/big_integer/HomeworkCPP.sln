@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "big_integer", "big_integer.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bind", "..\Bind\Bind.vcxproj", "{66537C80-305B-42ED-A8F7-D442C788FC01}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "template-task", "..\template-task\template-task.vcxproj", "{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{66537C80-305B-42ED-A8F7-D442C788FC01}.Release|x64.Build.0 = Release|x64
 		{66537C80-305B-42ED-A8F7-D442C788FC01}.Release|x86.ActiveCfg = Release|Win32
 		{66537C80-305B-42ED-A8F7-D442C788FC01}.Release|x86.Build.0 = Release|Win32
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Debug|x64.ActiveCfg = Debug|x64
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Debug|x64.Build.0 = Debug|x64
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Debug|x86.ActiveCfg = Debug|Win32
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Debug|x86.Build.0 = Debug|Win32
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Release|x64.ActiveCfg = Release|x64
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Release|x64.Build.0 = Release|x64
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Release|x86.ActiveCfg = Release|Win32
+		{5BB065C7-BBA9-4D62-A027-C25360EAAA7A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
