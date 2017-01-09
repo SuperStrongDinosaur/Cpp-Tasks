@@ -71,5 +71,6 @@ bind_t<F_, Args_...> bind(F_&& func, Args_&&... args) {
 	return bind_t<F_, Args_...>(std::forward<F_>(func), std::forward<Args_>(args)...);
 }
 
+
 #endif
 
