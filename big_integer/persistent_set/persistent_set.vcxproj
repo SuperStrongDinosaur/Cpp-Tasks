@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C9FDE53D-69B9-48AE-A526-F5B0D3AA5254}</ProjectGuid>
-    <RootNamespace>cache</RootNamespace>
+    <ProjectGuid>{A42D2330-BEDD-4358-BC72-C118BD201D62}</ProjectGuid>
+    <RootNamespace>persistent_set</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -110,27 +110,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Cache.h" />
-    <ClInclude Include="FIFOcache.h" />
-    <ClInclude Include="LFUcache.h" />
-    <ClInclude Include="LRUcache.h" />
+    <ClInclude Include="pers_set.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FIFOtest.cpp" />
-    <ClCompile Include="LFUtest.cpp" />
-    <ClCompile Include="LRUtest.cpp" />
-    <ClCompile Include="mainTEST.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="tests\FIFOcachetest0.txt" />
-    <Text Include="tests\FIFOcachetest1.txt" />
-    <Text Include="tests\FIFOcachetest2.txt" />
-    <Text Include="tests\LFUcachetest0.txt" />
-    <Text Include="tests\LFUcachetest1.txt" />
-    <Text Include="tests\LFUcachetest2.txt" />
-    <Text Include="tests\LRUcachetest0.txt" />
-    <Text Include="tests\LRUcachetest1.txt" />
-    <Text Include="tests\LRUcachetest2.txt" />
+    <ClCompile Include="pers_set.cpp" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

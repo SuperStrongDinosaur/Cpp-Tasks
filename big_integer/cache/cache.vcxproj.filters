@@ -14,4 +14,61 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LRUcache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFUcache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FIFOcache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mainTEST.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LRUtest.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFUtest.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FIFOtest.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="tests\FIFOcachetest0.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\FIFOcachetest1.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\FIFOcachetest2.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LFUcachetest0.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LFUcachetest1.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LFUcachetest2.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LRUcachetest0.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LRUcachetest1.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="tests\LRUcachetest2.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
