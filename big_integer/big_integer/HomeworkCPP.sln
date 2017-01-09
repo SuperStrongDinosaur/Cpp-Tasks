@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cache", "..\cache\cache.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "persistent_set", "..\persistent_set\persistent_set.vcxproj", "{A42D2330-BEDD-4358-BC72-C118BD201D62}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bimap", "..\bimap\bimap.vcxproj", "{C4FD0728-E24A-488E-B24C-05066E51B932}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{A42D2330-BEDD-4358-BC72-C118BD201D62}.Release|x64.Build.0 = Release|x64
 		{A42D2330-BEDD-4358-BC72-C118BD201D62}.Release|x86.ActiveCfg = Release|Win32
 		{A42D2330-BEDD-4358-BC72-C118BD201D62}.Release|x86.Build.0 = Release|Win32
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Debug|x64.ActiveCfg = Debug|x64
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Debug|x64.Build.0 = Debug|x64
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Debug|x86.ActiveCfg = Debug|Win32
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Debug|x86.Build.0 = Debug|Win32
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Release|x64.ActiveCfg = Release|x64
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Release|x64.Build.0 = Release|x64
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Release|x86.ActiveCfg = Release|Win32
+		{C4FD0728-E24A-488E-B24C-05066E51B932}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
