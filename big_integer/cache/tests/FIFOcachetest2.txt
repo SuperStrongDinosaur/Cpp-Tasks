@@ -1,0 +1,12 @@
+3 11
+put 1 1
+put 2 2
+put 3 3
+get 2 2 
+get 1 1
+put 4 4
+put 5 5
+get 1 exception
+get 2 exception
+get 4 4
+get 5 5

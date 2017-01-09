@@ -1,0 +1,8 @@
+3 7
+put 1 1
+put 2 2
+put 3 3
+get 1 1
+get 2 2
+put 4 4
+get 3 exception
