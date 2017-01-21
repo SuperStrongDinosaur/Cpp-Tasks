@@ -1,4 +1,5 @@
 #include "my_vec.h"
+#include <algorithm>
 
 my_vec::my_vec(size_t size) : sz(size) {
 	if (size < 2) 
