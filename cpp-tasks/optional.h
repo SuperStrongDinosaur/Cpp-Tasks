@@ -53,7 +53,18 @@ public:
     }
     
     optional& operator=(optional other) {
-        swap(other);
+        if(init && other.init) {
+            reset();
+            new (&data) T (*other);
+            init = true;
+        }
+        else if(!init && other.init) {
+            new (&data) T (*other);
+            init = true;
+        }
+        else if(init && !other.init) {
+            reset();
+        }
         return *this;
     }
     
@@ -85,7 +96,7 @@ public:
     
     void swap(optional& other) {
         if(init && other.init) {
-            std::swap(this->data, other.data);
+            std::swap(data, other.data);
         }
         else if(!init && other.init) {
             new (&data) T (*other);
@@ -152,7 +163,7 @@ public:
 
 template <typename T, typename ... Args>
 optional<T> make_optional(Args&& ...args) {
-    return optional<T>(std::forward<Args>(args)...);
+    return optional<T>(inplace_, std::forward<Args>(args)...);
 }
 
 #endif /* optional_h */
