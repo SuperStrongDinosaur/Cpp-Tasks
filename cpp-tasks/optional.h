@@ -13,10 +13,10 @@
 #include <utility>
 
 struct nullopt_t {};
-static nullopt_t nullopt_;
+constexpr nullopt_t nullopt_;
 
 struct inplace_t {};
-static inplace_t inplace_;
+constexpr inplace_t inplace_;
 
 template<typename T>
 class optional {
@@ -38,20 +38,19 @@ public:
         new (&data) T(std::forward<Args>(args)...);
     }
     
-    optional(optional& other) {
-        init = false;
+    optional(optional const & other) {
         if(other)
             new (&data) T(*other);
         init = other.init;
     }
     
-    optional(optional&& other) : init(other.init) {
+    optional(optional&& other) : init(false) {
         emplace(*other);
+        init = other.init;
     }
     
     ~optional() {
-        if(init)
-            (*reinterpret_cast<T*>(&data)).~T();
+        reset();
     }
     
     optional& operator=(optional other) {
@@ -82,7 +81,7 @@ public:
     T value_or(T&& default_value) {
         if(init)
             return *(*this);
-        return default_value;
+        return std::move(default_value);
     }
     
     void swap(optional& other) {
@@ -104,7 +103,8 @@ public:
     }
     
     inline void reset() {
-        this->~optional();
+        if(init)
+            (*reinterpret_cast<T*>(&data)).~T();
         init = false;
     }
     
