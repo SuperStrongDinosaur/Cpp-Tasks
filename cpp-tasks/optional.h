@@ -13,10 +13,10 @@
 #include <utility>
 
 struct nullopt_t {};
-constexpr nullopt_t nullopt_;
+constexpr nullopt_t nullopt_{};
 
 struct inplace_t {};
-constexpr inplace_t inplace_;
+constexpr inplace_t inplace_{};
 
 template<typename T>
 class optional {
@@ -153,9 +153,7 @@ public:
 
 template <typename T, typename ... Args>
 optional<T> make_optional(Args&& ...args) {
-    optional<T> temp;
-    temp.emplace(std::forward<Args>(args)...);
-    return temp;
+    return optional<T>(std::forward<Args>(args)...);
 }
 
 #endif /* optional_h */
