@@ -38,10 +38,9 @@ public:
         new (&data) T(std::forward<Args>(args)...);
     }
     
-    optional(optional const & other) {
+    optional(optional const & other) : init(other.init) {
         if(other)
             new (&data) T(*other);
-        init = other.init;
     }
     
     optional(optional&& other) : init(false) {
