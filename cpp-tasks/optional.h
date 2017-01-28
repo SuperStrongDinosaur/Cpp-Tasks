@@ -54,13 +54,10 @@ public:
     
     optional& operator=(optional other) {
         if(init && other.init) {
-            reset();
-            new (&data) T (*other);
-            init = true;
+            data = other.data;
         }
         else if(!init && other.init) {
-            new (&data) T (*other);
-            init = true;
+            emplace(std::move(*other));
         }
         else if(init && !other.init) {
             reset();
