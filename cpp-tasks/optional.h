@@ -1,0 +1,161 @@
+//
+//  optional.h
+//  cpp
+//
+//  Created by Alex Shirvinsky on 28.01.17.
+//  Copyright © 2017 Alex Shirvinsky. All rights reserved.
+//
+
+#ifndef optional_h
+#define optional_h
+
+#include <memory>
+#include <utility>
+
+struct nullopt_t {};
+static nullopt_t nullopt_;
+
+struct inplace_t {};
+static inplace_t inplace_;
+
+template<typename T>
+class optional {
+    typename std::aligned_storage<sizeof(T), alignof(T)>::type data;
+    bool init;
+    
+public:
+    
+    optional() : init(false) {}
+    
+    optional(T const& val) : init(true) {
+        new (&data) T(val);
+    }
+    
+    optional(nullopt_t) : init(false) {}
+    
+    template<typename ... Args>
+    optional(inplace_t, Args&& ... args) : init(true) {
+        new (&data) T(std::forward<Args>(args)...);
+    }
+    
+    optional(optional& other) {
+        init = false;
+        if(other)
+            new (&data) T(*other);
+        init = other.init;
+    }
+    
+    optional(optional&& other) : init(other.init) {
+        emplace(*other);
+    }
+    
+    ~optional() {
+        if(init)
+            (*reinterpret_cast<T*>(&data)).~T();
+    }
+    
+    optional& operator=(optional other) {
+        swap(other);
+        return *this;
+    }
+    
+    T operator*() {
+        return *reinterpret_cast<T*>(&data);
+    }
+    
+    T* operator->() {
+        return reinterpret_cast<T*>(&data);
+    }
+    
+    const T operator*() const {
+        return *reinterpret_cast<const T*>(&data);
+    }
+    
+    const T* operator->() const {
+        return reinterpret_cast<const T*>(&data);
+    }
+    
+    explicit operator bool() const {
+        return init;
+    }
+    
+    T value_or(T&& default_value) {
+        if(init)
+            return *(*this);
+        return default_value;
+    }
+    
+    void swap(optional& other) {
+        if(init && other.init) {
+            std::swap(this->data, other.data);
+        }
+        else if(!init && other.init) {
+            new (&data) T (*other);
+            init = true;
+            (*reinterpret_cast<T*>(&other.data)).~T();
+            other.init = false;
+        }
+        else if(init && !other.init) {
+            new (&other.data) T(**this);
+            init = false;
+            (*reinterpret_cast<T*>(&data)).~T();
+            other.init = true;
+        }
+    }
+    
+    inline void reset() {
+        this->~optional();
+        init = false;
+    }
+    
+    template<typename ... Args>
+    void emplace(Args&& ... args) {
+        reset();
+        new (&data) T(std::forward<Args>(args)...);
+        init = true;
+    }
+    
+    friend bool operator==(optional const& a, optional const& b) {
+        if(a.init != b.init)
+            return false;
+        if(!a.init)
+            return true;
+        return *a == *b;
+    }
+    
+    friend bool operator!=(optional const& a, optional const& b) {
+        return !(a == b);
+    }
+    
+    friend bool operator<(optional const& a, optional const& b) {
+        if(a) {
+            if(b)
+                return *a < *b;
+            else
+                return false;
+        } else if(b)
+            return true;
+        return false;
+    }
+    
+    friend bool operator>(optional const& a, optional const& b) {
+        return b < a;
+    }
+    
+    friend bool operator<=(optional const& a, optional const& b) {
+        return a < b || a == b;
+    }
+    
+    friend bool operator>=(optional const& a, optional const& b) {
+        return a > b || a == b;
+    }
+};
+
+template <typename T, typename ... Args>
+optional<T> make_optional(Args&& ...args) {
+    optional<T> temp;
+    temp.emplace(std::forward<Args>(args)...);
+    return temp;
+}
+
+#endif /* optional_h */
