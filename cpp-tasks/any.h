@@ -49,7 +49,7 @@ public:
         any().swap(*this);
     }
     
-    const std::type_index type() const {
+    const std::type_info& type() const {
         return data ? data->type() : typeid(void);
     }
     
@@ -62,7 +62,7 @@ public:
 private:
     struct placeholder {
         virtual ~placeholder() {}
-        virtual const std::type_index type() const = 0;
+        virtual const std::type_info& type() const = 0;
         virtual placeholder* clone() const = 0;
     };
     
@@ -73,7 +73,7 @@ private:
         
         holder(T&& val) : data(static_cast<T&&>(val)) {}
         
-        virtual const std::type_index type() const {
+        virtual const std::type_info& type() const {
             return typeid(T);
         }
         
