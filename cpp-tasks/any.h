@@ -54,16 +54,11 @@ public:
         return std::move(data ? data->type() : typeid(void));
     }
     
-    template<typename T>
-    friend T* any_cast(any*);
-    template<typename T>
-    friend inline const T* any_cast(const any*);
-    template<typename T>
-    friend T any_cast(any& oper);
-    template<typename T>
-    friend inline T any_cast(const any& oper);
-    template<typename T>
-    friend inline T any_cast(any&& oper);
+    template<typename T> friend T* any_cast(any*);
+    template<typename T> friend const T* any_cast(const any*);
+    template<typename T> friend T any_cast(any& oper);
+    template<typename T> friend T any_cast(const any& oper);
+    template<typename T> friend T any_cast(any&& oper);
     
 private:
     struct placeholder {
@@ -75,36 +70,36 @@ private:
     template<typename T>
     class holder : public placeholder {
     public:
-        holder(const T & val) : held(val) {}
+        holder(const T & val) : data(val) {}
         
-        holder(T&& val) : held(static_cast<T&&>(val)) {}
+        holder(T&& val) : data(static_cast<T&&>(val)) {}
         
         virtual const std::type_index& type() const {
             return std::move(typeid(T));
         }
         
         virtual placeholder* clone() const {
-            return std::move(new holder(held));
+            return std::move(new holder(data));
         }
 
-        T held;
+        T data;
     };
     
     std::shared_ptr<placeholder> data;
 };
 
-inline void swap(any& a, any& b) {
+void swap(any& a, any& b) {
     a.swap(b);
 }
 
 template<typename T>
 T* any_cast(any* oper) {
     return oper && oper->type() == typeid(T) ?
-    &static_cast<any::holder<typename std::remove_cv<T>::type>*>(oper->data.get())->held : 0;
+    &static_cast<any::holder<typename std::remove_cv<T>::type>*>(oper->data.get())->data : 0;
 }
 
 template<typename T>
-inline const T* any_cast(const any* oper) {
+const T* any_cast(const any* oper) {
     return any_cast<T>(const_cast<any*>(oper));
 }
 
@@ -116,13 +111,13 @@ T any_cast(any& oper) {
 }
 
 template<typename T>
-inline T any_cast(const any& oper) {
+T any_cast(const any& oper) {
     typedef typename std::remove_reference<T>::type non;
     return any_cast<const non&>(const_cast<any&>(oper));
 }
 
 template<typename T>
-inline T any_cast(any&& oper) {
+T any_cast(any&& oper) {
     return any_cast<T>(oper);
 }
 
