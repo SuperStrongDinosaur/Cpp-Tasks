@@ -9,7 +9,7 @@
 #ifndef any_h
 #define any_h
 
-#include <typeindex>
+#include <typeinfo>
 
 class any {
 public:
