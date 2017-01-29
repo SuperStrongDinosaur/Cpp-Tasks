@@ -13,7 +13,7 @@
 
 class any {
 public:
-    any(): data(0) {}
+    any(): data() {}
     
     template<typename T>
     any(const T& val) :
@@ -21,7 +21,7 @@ public:
     
     any(const any& other) : data(other.data ? other.data->clone() : 0) {}
     
-    any(any&& other) : data(other.data) {}
+    any(any&& other) : data(std::move(other.data)) {}
     
     ~any() {}
     
@@ -71,7 +71,7 @@ private:
     public:
         holder(const T & val) : data(val) {}
         
-        holder(T&& val) : data(static_cast<T&&>(val)) {}
+        holder(T&& val) : data(std::move(val)) {}
         
         virtual const std::type_info& type() const {
             return typeid(T);
@@ -84,7 +84,7 @@ private:
         T data;
     };
     
-    std::shared_ptr<placeholder> data;
+    std::unique_ptr<placeholder> data;
 };
 
 void swap(any& a, any& b) {
