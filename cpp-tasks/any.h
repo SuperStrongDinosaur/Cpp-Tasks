@@ -38,7 +38,7 @@ public:
    
     template <class T>
     any& operator=(T&& other) {
-        any(static_cast<T&&>(other)).swap(*this);
+        any(std::move(other)).swap(*this);
         return *this;
     }
     
@@ -50,8 +50,8 @@ public:
         any().swap(*this);
     }
     
-    const std::type_index& type() const {
-        return std::move(data ? data->type() : typeid(void));
+    const std::type_index type() const {
+        return data ? data->type() : typeid(void);
     }
     
     template<typename T> friend T* any_cast(any*);
@@ -63,7 +63,7 @@ public:
 private:
     struct placeholder {
         virtual ~placeholder() {}
-        virtual const std::type_index& type() const = 0;
+        virtual const std::type_index type() const = 0;
         virtual placeholder* clone() const = 0;
     };
     
@@ -74,12 +74,12 @@ private:
         
         holder(T&& val) : data(static_cast<T&&>(val)) {}
         
-        virtual const std::type_index& type() const {
-            return std::move(typeid(T));
+        virtual const std::type_index type() const {
+            return typeid(T);
         }
         
         virtual placeholder* clone() const {
-            return std::move(new holder(data));
+            return new holder(data);
         }
 
         T data;
