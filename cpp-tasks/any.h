@@ -9,6 +9,7 @@
 #ifndef any_h
 #define any_h
 
+#include <memory>
 #include <typeinfo>
 
 class any {
