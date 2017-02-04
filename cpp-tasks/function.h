@@ -29,7 +29,7 @@ public:
             is_small = true;
         }
         else {
-            cont = std::make_shared<free_holder<T>>(f);
+            cont = std::make_unique<free_holder<T>>(f);
             is_small = false;
         }
     }
@@ -41,7 +41,7 @@ public:
             is_small = true;
         }
         else {
-            cont = std::make_shared<member_holder<T, Params ...>>(f);
+            cont = std::make_unique<member_holder<T, Params ...>>(f);
             is_small = false;
         }
     }
@@ -96,7 +96,7 @@ private:
         holder_base() {}
         virtual ~holder_base() {}
         virtual R caller(Params ... args) = 0;
-        virtual std::shared_ptr<holder_base> clone() = 0;
+        virtual std::unique_ptr<holder_base> clone() = 0;
         holder_base(const holder_base & );
         void operator=(const holder_base &);
     };
@@ -105,7 +105,7 @@ private:
         return static_cast<holder_base *>(data);
     }
     
-    typedef std::shared_ptr<holder_base> callerr_t;
+    typedef std::unique_ptr<holder_base> callerr_t;
  
     template <typename T>
     class free_holder : public holder_base {
