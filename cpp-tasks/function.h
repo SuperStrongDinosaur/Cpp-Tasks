@@ -20,22 +20,53 @@ public:
     
     typedef R signature_type (Params ...);
     
-    function() : cont() {}
+    function() : is_small(true) {}
     
     template <typename T>
-    function(T f) : cont(new free_holder<T>(f)) {}
+    function(T f) {
+        if(sizeof(f) < 1024) {
+            new (&small_cont) free_holder<T>(f);
+            is_small = true;
+        }
+        else {
+            cont = std::make_shared<free_holder<T>>(f);
+            is_small = false;
+        }
+    }
     
     template <typename T, typename ClassType>
-    function(T ClassType::* f) : cont(new member_holder<T, Params ...>(f)) {}
+    function(T ClassType::* f) {
+        if(sizeof(f) < 1024) {
+            new (&small_cont) member_holder<T, Params ...>(f);
+            is_small = true;
+        }
+        else {
+            cont = std::make_shared<member_holder<T, Params ...>>(f);
+            is_small = false;
+        }
+    }
     
-    function(const function & other) : cont(other.cont->clone()) {}
+    function(const function & other) : is_small(other.is_small) {
+        if(is_small)
+            small_cont = other.small_cont;
+        else
+            cont = other.cont->clone();
+    }
     
     function(function&& f) {
-        std::swap(f.cont, cont);
+        if(!is_small)
+            std::swap(f.cont, cont);
+        else
+            std::swap(f.small_cont, small_cont);
+        std::swap(f.is_small, is_small);
     }
     
     function & operator=(const function & other) {
-        cont = other.cont->clone();
+        if(!is_small)
+            cont = other.cont->clone();
+        else
+            small_cont = other.cmall_cont;
+        is_small = other.small_cont;
         return *this;
     }
     
@@ -45,7 +76,9 @@ public:
     }
     
     R operator()(Params ... args) {
-        return cont->caller(args ...);
+        if(!is_small)
+            return cont->caller(args ...);
+        return get(&small_cont)->caller(args ...);
     }
     
     void swap(function& other) {
@@ -57,97 +90,64 @@ public:
     }
     
 private:
-    
+
     class holder_base {
     public:
         holder_base() {}
         virtual ~holder_base() {}
         virtual R caller(Params ... args) = 0;
         virtual std::shared_ptr<holder_base> clone() = 0;
-    private:
         holder_base(const holder_base & );
         void operator=(const holder_base &);
     };
     
+    inline holder_base* get(void *data) {
+        return static_cast<holder_base *>(data);
+    }
+    
     typedef std::shared_ptr<holder_base> callerr_t;
-    
-    
+ 
     template <typename T>
     class free_holder : public holder_base {
     public:
-        
-        free_holder(T func)  {
-            if(sizeof(func) < 1024) {
-                new (&small_mFunc) T(func);
-                is_small = true;
-            }
-            else {
-                mFunc = std::make_shared<T>(func);
-                is_small = false;
-            }
-        }
+        free_holder(T func) : holder_base(), mFunction(func) {}
         
         virtual R caller(Params ... args) {
-            if(!is_small)
-                return (*mFunc)(args ...);
-            return (get(&small_mFunc))(args ...);
+            return mFunction(args ...);
         }
-        
-        inline T get(void *data) {
-            return *static_cast<T *>(data);
-        }
-        
+    
         virtual callerr_t clone() {
-            if(!is_small)
-                return callerr_t(new free_holder(*mFunc));
-            return callerr_t(new free_holder(get(&small_mFunc)));
+            return callerr_t(new free_holder(mFunction));
         }
+        private:
         
-    private:
-        bool is_small;
-        typename std::aligned_storage<1024, 8>::type small_mFunc;
-        std::shared_ptr<T> mFunc;
+        T mFunction;
     };
+    
     
     template <typename T, typename ClassType, typename ... RestParams>
     class member_holder : public holder_base {
     public:
+        
         typedef typename std::remove_reference<ClassType>::type non;
         typedef T non::* member_signature_t;
-
-        member_holder(member_signature_t f) {
-            if(sizeof(f) < 1024) {
-                new (&small_mFunc) member_signature_t(f);
-                is_small = true;
-            }
-            else {
-                mFunc = std::make_shared<member_signature_t>(f);
-                is_small = false;
-            }
-        }
+        
+        member_holder(member_signature_t f) : mFunction(f) {}
         
         virtual R caller(ClassType obj, RestParams ... restArgs) {
-            if(!is_small)
-                return (obj.*(*mFunc))(restArgs ...);
-            return (obj.*(get(&small_mFunc)))(restArgs ...);
-        }
-        
-        inline member_signature_t get(void *data) {
-            return *static_cast<member_signature_t *>(data);
+            return (obj.*mFunction)(restArgs ...);
         }
         
         virtual callerr_t clone() {
-            if(!is_small)
-                return callerr_t(new member_holder(*mFunc));
-            return callerr_t(new member_holder(get(&small_mFunc)));
+            return callerr_t(new member_holder(mFunction));
         }
         
     private:
-        bool is_small;
-        typename std::aligned_storage<1024, 8>::type small_mFunc;
-        std::shared_ptr<member_signature_t> mFunc;
+        member_signature_t mFunction;
     };
     
+    bool is_small;
+    typename std::aligned_storage<1024, 8>::type small_cont;
     callerr_t cont;
 };
 
