@@ -167,4 +167,4 @@ private:
     
 };
 
-#endif /* signals_soo_hpp */
+#endif 
