@@ -77,7 +77,7 @@ public:
 
     bool is_rem_poss(ptr_t ptr) {
         if(entrancy) {
-            post_add.push_back(ptr);
+            post_rem.push_back(ptr);
             return false;
         }
         return true;
@@ -126,7 +126,9 @@ public:
                 if ((*it) -> is_connected()) {
                     (*(*it))(p...);
                 }
-                else {
+            }
+            for (auto it = slots.begin(); it != slots.end(); it++) {
+                if (!(*it) -> is_connected()) {
                     it = slots.erase(it);
                     if(it != slots.begin()) it--;
                     sz--;
