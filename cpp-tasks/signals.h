@@ -74,8 +74,6 @@ public:
     private:
         ptr_t pointer;
     };
-    
-    friend connection;
 
     bool is_rem_poss(ptr_t ptr) {
         if(entrancy) {
@@ -91,13 +89,12 @@ public:
             post_add.push_back(ptr);
         }
         if (sz == 1) {
-            slots = std::make_shared<std::list<ptr_t>>();
-            (*slots).emplace_back(small_slot);
-            (*slots).push_back(ptr);
+            slots.emplace_back(small_slot);
+            slots.push_back(ptr);
         } else if(sz == 0) {
             small_slot = ptr;
         } else {
-            (*slots).push_back(ptr);
+            slots.push_back(ptr);
         }
         sz++;
         return connection(ptr);
@@ -105,7 +102,7 @@ public:
     
     void disconnect_all() {
         if(sz > 1) {
-            for (auto it = (*slots).begin(); it != (*slots).end(); it++) {
+            for (auto it = slots.begin(); it != slots.end(); it++) {
                 (*it)->disconnect();
             }
         }
@@ -125,21 +122,21 @@ public:
                 }
             }
         } else {
-            for (auto it = (*slots).begin(); it != (*slots).end(); it++) {
+            for (auto it = slots.begin(); it != slots.end(); it++) {
                 if ((*it) -> is_connected()) {
                     (*(*it))(p...);
                 }
                 else {
-                    it = (*slots).erase(it);
-                    if(it != (*slots).begin()) it--;
+                    it = slots.erase(it);
+                    if(it != slots.begin()) it--;
                     sz--;
                 }
             }
             if (sz == 1) {
-                small_slot = (*slots).front();
-                slots.reset();
+                small_slot = slots.front();
+                slots.clear();
             } else if(sz == 0) {
-                slots.reset();
+                slots.clear();
             }
         }
         
@@ -154,14 +151,14 @@ private:
         }
         post_rem.clear();
         for (auto& c : post_add) {
-            (*slots).emplace_back(std::move(c));
+            slots.emplace_back(std::move(c));
         }
         post_add.clear();
     }
     
     size_t sz;
     ptr_t small_slot;
-    std::shared_ptr<std::list<ptr_t>> slots;
+    std::list<ptr_t> slots;
     std::list<ptr_t> post_add;
     std::list<ptr_t> post_rem;
     bool entrancy;
