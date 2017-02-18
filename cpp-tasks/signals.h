@@ -127,13 +127,6 @@ public:
                     (*(*it))(p...);
                 }
             }
-            for (auto it = slots.begin(); it != slots.end(); it++) {
-                if (!(*it) -> is_connected()) {
-                    it = slots.erase(it);
-                    if(it != slots.begin()) it--;
-                    sz--;
-                }
-            }
             if (sz == 1) {
                 small_slot = slots.front();
                 slots.clear();
@@ -152,6 +145,13 @@ private:
             c->disconnect();
         }
         post_rem.clear();
+        for (auto it = slots.begin(); it != slots.end(); it++) {
+            if (!(*it) -> is_connected()) {
+                it = slots.erase(it);
+                if(it != slots.begin()) it--;
+                sz--;
+            }
+        }
         for (auto& c : post_add) {
             slots.emplace_back(std::move(c));
         }
@@ -167,4 +167,4 @@ private:
     
 };
 
-#endif 
+#endif
