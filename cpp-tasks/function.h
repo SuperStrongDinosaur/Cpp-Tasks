@@ -9,6 +9,7 @@
 #ifndef function_h
 #define function_h
 
+#include <type_traits>
 #include <functional>
 
 template <typename Sig>
@@ -24,12 +25,12 @@ public:
     
     template <typename T>
     function(T f) {
-        if(sizeof(f) < 1024) {
-            new (&small_cont) free_holder<T>(f);
+        if(sizeof(f) < 1024 && std::is_nothrow_move_constructible<T>::value) {
+            new (&small_cont) free_holder<T>(std::move(f));
             is_small = true;
         }
         else {
-            cont = std::make_unique<free_holder<T>>(f);
+            cont = std::make_unique<free_holder<T>>(std::move(f));
             is_small = false;
         }
     }
@@ -56,8 +57,16 @@ public:
     function(function&& f) {
         if(!is_small)
             std::swap(f.cont, cont);
-        else
-            std::swap(f.small_cont, small_cont);
+        else {
+           // std::swap(small_cont, f.small_cont);
+            auto a = get(&small_cont)->get();
+            auto b = get(&f.small_cont)->get();
+            auto c = std::move(a);
+            a = std::move(b);
+            b = std::move(c);
+            small_cont = *static_cast<typename std::aligned_storage<1024, 8>::type*>(std::move(b));
+            f.small_cont = *static_cast<typename std::aligned_storage<1024, 8>::type*>(std::move(c));
+        }
         std::swap(f.is_small, is_small);
     }
     
@@ -81,8 +90,17 @@ public:
         return get(&small_cont)->caller(args ...);
     }
     
-    void swap(function& other) {
-        std::swap(other.cont, cont);
+    void swap(function& f) {
+        if(!is_small)
+            std::swap(f.cont, cont);
+        else {
+            auto a = get(&small_cont)->get();
+            auto b = get(&f.small_cont)->get();
+            auto c = std::move(a);
+            small_cont = *static_cast<typename std::aligned_storage<1024, 8>::type*>(std::move(b));
+            f.small_cont = *static_cast<typename std::aligned_storage<1024, 8>::type*>(std::move(c));
+        }
+        std::swap(f.is_small, is_small);
     }
     
     explicit operator bool() const {
@@ -95,10 +113,11 @@ private:
     public:
         holder_base() {}
         virtual ~holder_base() {}
-        virtual R caller(Params ... args) = 0;
+        virtual R caller(Params& ... args) = 0;
         virtual std::unique_ptr<holder_base> clone() = 0;
         holder_base(const holder_base & );
         void operator=(const holder_base &);
+        virtual void* get() = 0;
     };
     
     inline holder_base* get(void *data) {
@@ -110,17 +129,25 @@ private:
     template <typename T>
     class free_holder : public holder_base {
     public:
-        free_holder(T func) : holder_base(), mFunction(func) {}
+        free_holder(T func) : holder_base(), mFunction(std::move(func)) {}
         
-        virtual R caller(Params ... args) {
+        virtual R caller(Params&... args) {
             return mFunction(args ...);
         }
     
         virtual callerr_t clone() {
             return callerr_t(new free_holder(mFunction));
         }
-        private:
         
+        /*virtual void swap(holder_base& other) {
+            std::swap(mFunction, other.mFunction);
+        }*/
+        
+        virtual void* get() {
+            return static_cast<void*>(&mFunction);
+        }
+        
+    private:
         T mFunction;
     };
     
@@ -134,12 +161,20 @@ private:
         
         member_holder(member_signature_t f) : mFunction(f) {}
         
-        virtual R caller(ClassType obj, RestParams ... restArgs) {
+        virtual R caller(ClassType& obj, RestParams& ... restArgs) {
             return (obj.*mFunction)(restArgs ...);
         }
         
         virtual callerr_t clone() {
             return callerr_t(new member_holder(mFunction));
+        }
+        
+        /*virtual void swap(holder_base& other) {
+            std::swap(mFunction, other.mFunction);
+        }*/
+        
+        virtual void* get() {
+            return static_cast<void*>(&mFunction);
         }
         
     private:
