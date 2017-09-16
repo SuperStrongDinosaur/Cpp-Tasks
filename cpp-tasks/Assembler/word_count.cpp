@@ -1,21 +1,6 @@
 #include <iostream>
 #include <tmmintrin.h>
 
-__m128i tmp_reg;
-
-void print128_num_by_words(__m128i var) {
-    uint16_t *val = (uint16_t*) &var;
-    printf("Value in words: %i %i %i %i %i %i %i %i \n", val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
-}
-
-void print128_num_by_bytes(__m128i var) {
-    char *val = (char *) &var;
-    printf("Value in bytes: ");
-    for(size_t i = 0; i < 16; i++)
-        printf("%d ", (int)*(val + i));
-    printf("\n");
-}
-
 uint32_t count_simple(std::string const& str) {
     uint32_t ret = 0;
     bool prev_is_space = true;
@@ -39,7 +24,7 @@ uint32_t count_asm(std::string const& str) {
     char const *s = str.c_str();
     
     __m128i space_reg = _mm_set_epi8(32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32);
-    __m128i cmp_result, cmp_result_sh, store = _mm_set_epi32(0, 0, 0, 0);
+    __m128i cmp_result, cmp_result_sh, store = _mm_set_epi32(0, 0, 0, 0), tmp_reg;
     
     size_t cur_pos = 0;
     bool is_ws = false;
@@ -67,7 +52,7 @@ uint32_t count_asm(std::string const& str) {
     for (size_t i = cur_pos; i < size - 16 ; i += 16) {
         
         cmp_result = cmp_result_sh;
-        uint32_t moskva;
+        uint32_t m;
         
         __m128i tmp04, tmp05, tmp06, tmp07;
         __asm__("movdqa (%7), %3\n"
@@ -78,10 +63,10 @@ uint32_t count_asm(std::string const& str) {
                 "psubsb %6, %5\n"
                 "paddusb %5, %1\n"
                 "pmovmskb %1, %2"
-                :"=x"(cmp_result_sh), "=x"(store), "=r"(moskva), "=x"(tmp04), "=x"(tmp05), "=x"(tmp06), "=x"(tmp07)
+                :"=x"(cmp_result_sh), "=x"(store), "=r"(m), "=x"(tmp04), "=x"(tmp05), "=x"(tmp06), "=x"(tmp07)
                 :"r"(s + i + 16), "0"(space_reg), "1"(store), "4"(cmp_result), "5"(_mm_set_epi32(0, 0, 0, 0)));
         
-        if (moskva != 0) {
+        if (m != 0) {
             __m128i abs_low, tt;
             uint32_t high, low;
             
