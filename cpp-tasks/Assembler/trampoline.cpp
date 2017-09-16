@@ -61,6 +61,12 @@ private:
         p += BYTE / 2;
     }
     
+    void add(char *&p, const char *command, void *c) {
+        add(p, command);
+        *(void **) p = c;
+        p += BYTE;
+    }
+    
     void *addr = nullptr;
     const size_t PAGE_SIZE = 4096;
     const size_t SIZE_PER_FUNC = 255;
@@ -148,13 +154,9 @@ public:
             //sub rsp, stack_size
             add(pcode, "\x48\x81\xec", stack_size);
             //mov rdi, imm
-            add(pcode, "\x48\xbf");
-            *(void **) pcode = func;
-            pcode += BYTE;
+            add(pcode, "\x48\xbf", func);
             //mov rax, imm
-            add(pcode, "\x48\xb8");
-            *(void **) pcode = (void *) &caller<F>;
-            pcode += BYTE;
+            add(pcode, "\x48\xb8", (void *) &caller<F>);
             //call rax
             add(pcode, "\xff\xd0");
             // pop r9
@@ -167,13 +169,9 @@ public:
             for (int i = args<Args ...>::INT - 1; i >= 0; i--)
                 add(pcode, shifts[i]);
             //mov rdi imm
-            add(pcode, "\x48\xbf");
-            *(void **) pcode = func;
-            pcode += BYTE;
+            add(pcode, "\x48\xbf", func);
             //mov rax imm
-            add(pcode, "\x48\xb8");
-            *(void **) pcode = (void *) &caller<F>;
-            pcode += BYTE;
+            add(pcode, "\x48\xb8", (void *) &caller<F>);
             //mov jmp raxi
             add(pcode, "\xff\xe0");
         }
@@ -279,6 +277,7 @@ void test_2() {
     }
     
     b = 124;
+    
     p(9, 8, 7, 6, 5, 4, 3, 2, 1);
 }
 
