@@ -20,10 +20,10 @@ void memcpy_asm(void *to, const void *from, size_t sz) {
     for (size_t i = cur_pos; i < sz - aligned_sz; i += 16) {
         __m128i reg;
         __asm__ volatile (
-                          "movdqu (%1), %0\n"
-                          "movntdq %0, (%2)\n"
+                          "movdqu (%1, %2), %0\n"
+                          "movntdq %0, (%2, %3)\n"
                           :"=x"(reg)
-                          :"r"((const char *)from + i), "r"((char *)to + i)
+                          :"r"((const char *)from), "r"(i), "r"((char*)to)
                           :"memory");
     }
     
