@@ -3,7 +3,7 @@
 #include <emmintrin.h>
 #include <vector>
 
-const size_t N = (1 << 30);
+const size_t N = (1 << 27);
 
 void memcpy_simple(void *to, const void *from, size_t sz) {
     for (size_t i = 0; i < sz; i++)
@@ -40,6 +40,11 @@ bool check(std::vector<char> & a, std::vector<char> & b) {
     return true;
 }
 
+void make_rng(std::vector<char> & a) {
+    for(size_t i = 0; i < a.size(); i++)
+        a[i] = rand() % 100;
+}
+
 int main() {
     //char *from = new char[N];
    // char *to = new char[N];
@@ -47,6 +52,8 @@ int main() {
     std::vector<char> to(N);
     
     for(;;) {
+        make_rng(from);
+        make_rng(to);
     auto begin = std::clock();
     memcpy_simple(to.data(), from.data(), N);
     std::cout << (double)(std::clock() - begin) / CLOCKS_PER_SEC << std::endl;
