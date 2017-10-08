@@ -1,31 +1,35 @@
 #include <iostream>
 #include <emmintrin.h>
 
-size_t count_simple(const char * str, size_t size) {
-    uint32_t ret = 0;
-    bool prev_is_space = true;
-    for(size_t i = 0; i < size; i++) {
-        if(str[i] != ' ' && prev_is_space) {
-            ret++;
-            prev_is_space = false;
-        } else if(str[i] == ' ') {
-            prev_is_space = true;
+size_t count_simple(const char * text, size_t size, bool is_ws) {
+    size_t result = 0;
+    for (size_t i = 0; i < size; i++) {
+        if (text[i] == 32) {
+            is_ws = true;
+        } else if (is_ws) {
+            is_ws = false;
+            result++;
         }
     }
-    return ret;
+    return result;
 }
 
-size_t count_asm(std::string input) {
-    bool ws_seq = false;
-    const char *str = input.c_str();
-    size_t size = input.length();
+size_t count_simple(std::string input) {
+    bool is_ws = false;
+    return count_simple(input.c_str(), input.size(), is_ws) + ((input.size() == 0 || input[0] == 32) ? 0 : 1);
+}
+
+size_t count_asm(std::string& input) {
+    bool is_ws = false;
+    const char *text = input.c_str();
+    size_t size = input.size();
     
-    int ans = (size == 0 || str[0] == 32) ? 0 : 1;
-    size_t offset = (size_t)str % 16;
+    int result = (size == 0 || text[0] == 32) ? 0 : 1;
+    size_t offset = (size_t)text % 16;
     if (offset != 0) {
         offset = 16 - offset;
-        ans += count_simple(str, offset);
-        str += offset;
+        result += count_simple(text, offset, is_ws);
+        text += offset;
         size -= offset;
     }
     
@@ -34,8 +38,8 @@ size_t count_asm(std::string input) {
     __asm__ volatile(
                      "movdqa     (%0), %1\n"
                      "pcmpeqb    %2, %1\n"
-                     : "=r" (str),"=x" (next), "=x" (spaces)
-                     : "0" (str), "1" (next), "2" (spaces)
+                     : "=r" (text),"=x" (next), "=x" (spaces)
+                     : "0" (text), "1" (next), "2" (spaces)
                      : "memory", "cc"
                      );
     
@@ -52,22 +56,19 @@ size_t count_asm(std::string input) {
                          "palignr    $1, %1, %2\n"
                          "pandn      %1, %2\n"
                          "pmovmskb   %2, %5\n"
-                         : "=r" (str), "=x" (curr), "=x" (tmp), "=x" (next), "=x" (spaces), "=r" (a)
-                         : "0" (str), "1" (curr), "2" (tmp), "3" (next), "4" (spaces), "5" (a)
+                         : "=r" (text), "=x" (curr), "=x" (tmp), "=x" (next), "=x" (spaces), "=r" (a)
+                         : "0" (text), "1" (curr), "2" (tmp), "3" (next), "4" (spaces), "5" (a)
                          : "memory", "cc"
                          );
-        
-    
-        ans += __builtin_popcount(a);
+        result += __builtin_popcount(a);
     }
-    ws_seq = false;
-    return ans + count_simple(str, size);
+    return result + count_simple(text, size, false);
 }
 
 int main() {
-    std::string str = "hthpfc ethth  nmwhthqc yrqnd  wzlz d  qlnvmk  w g   iv  ic qa sertyuiopoiuytretyuiop[oiuytryuiopoiuytryuiop[]p oiytretyuiop[ptryuiop[poiuytuiop[oiuytuiopiuythth tuioiuyghjkopiuyujiokijughbo  d e a v                                                  ";
+    std::string str = "  hthpfc ethth   d e a v                                fef                 ";
     auto begin = std::clock();
-    std::cout << count_simple(str.c_str(), str.length()) << " time: " << std::clock() - begin << std::endl;
+    std::cout << count_simple(str) << " time: " << std::clock() - begin << std::endl;
     begin = std::clock();
     std::cout << count_asm(str) << " time: " << std::clock() - begin << std::endl;
     return 0;
