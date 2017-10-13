@@ -1,22 +1,18 @@
 #include <iostream>
 #include <emmintrin.h>
 
-size_t count_simple(const char * text, size_t size, bool is_ws) {
+size_t count_simple(std::string input) {
+    bool is_ws = false;
     size_t result = 0;
-    for (size_t i = 0; i < size; i++) {
-        if (text[i] == 32) {
+    for (size_t i = 0; i < input.size(); i++) {
+        if (input[i] == 32) {
             is_ws = true;
         } else if (is_ws) {
             is_ws = false;
             result++;
         }
     }
-    return result;
-}
-
-size_t count_simple(std::string input) {
-    bool is_ws = false;
-    return count_simple(input.c_str(), input.size(), is_ws) + ((input.size() == 0 || input[0] == 32) ? 0 : 1);
+    return result + ((input.size() == 0 || input[0] == 32) ? 0 : 1);
 }
 
 size_t count_asm(std::string& input) {
@@ -24,11 +20,24 @@ size_t count_asm(std::string& input) {
     const char *text = input.c_str();
     size_t size = input.size();
     
+    auto simple_count = [](const char * text, size_t size, bool is_ws) {
+        size_t result = 0;
+        for (size_t i = 0; i < size; i++) {
+            if (text[i] == 32) {
+                is_ws = true;
+            } else if (is_ws) {
+                is_ws = false;
+                result++;
+            }
+        }
+        return result;
+    };
+    
     int result = (size == 0 || text[0] == 32) ? 0 : 1;
     size_t offset = (size_t)text % 16;
     if (offset != 0) {
         offset = 16 - offset;
-        result += count_simple(text, offset, is_ws);
+        result += simple_count(text, offset, is_ws);
         text += offset;
         size -= offset;
     }
@@ -62,7 +71,7 @@ size_t count_asm(std::string& input) {
                          );
         result += __builtin_popcount(a);
     }
-    return result + count_simple(text, size, false);
+    return result + simple_count(text, size, false);
 }
 
 int main() {
