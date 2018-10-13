@@ -1,81 +1,74 @@
 #include <iostream>
 #include <emmintrin.h>
 
-size_t count_simple(std::string input) {
-    bool is_ws = false;
+size_t count_simple(std::string& input) {
+    bool is_ws = true;
     size_t result = 0;
     for (size_t i = 0; i < input.size(); i++) {
-        if (input[i] == 32) {
-            is_ws = true;
-        } else if (is_ws) {
-            is_ws = false;
+        if (is_ws && input[i] != ' ') {
             result++;
         }
+        is_ws = (input[i] == ' ');
     }
-    return result + ((input.size() == 0 || input[0] == 32) ? 0 : 1);
+    return result;
 }
 
 size_t count_asm(std::string& input) {
-    bool is_ws = false;
+    if (input == "")
+        return 0;
     const char *text = input.c_str();
-    size_t size = input.size();
+    size_t length = input.length();
     
     auto simple_count = [](const char * text, size_t size, bool is_ws) {
         size_t result = 0;
         for (size_t i = 0; i < size; i++) {
-            if (text[i] == 32) {
-                is_ws = true;
-            } else if (is_ws) {
-                is_ws = false;
+            if (is_ws && text[i] != ' ') {
                 result++;
             }
+            is_ws = (text[i] == ' ');
         }
         return result;
     };
     
-    int result = (size == 0 || text[0] == 32) ? 0 : 1;
-    size_t offset = (size_t)text % 16;
-    if (offset != 0) {
-        offset = 16 - offset;
-        result += simple_count(text, offset, is_ws);
-        text += offset;
-        size -= offset;
-    }
-    
-    __m128i spaces = _mm_set_epi8(32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32);
-    __m128i curr, next, tmp;
-    __asm__ volatile(
-                     "movdqa     (%0), %1\n"
-                     "pcmpeqb    %2, %1\n"
-                     : "=r" (text),"=x" (next), "=x" (spaces)
-                     : "0" (text), "1" (next), "2" (spaces)
-                     : "memory", "cc"
-                     );
-    
-    for (; size >= 32; size -= 16) {
-        int32_t a;
+    int result = 0;
+    if (length >= 32) {
+        __m128i spaces = _mm_set_epi8(' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+        __m128i curr, next, tmp;
         __asm__ volatile(
-                         "add        $16,  %0\n"
-                         "movdqa     %3, %1\n"
-                         "movdqa     (%0), %2\n"
-                         
-                         "pcmpeqb    %4, %2\n"
-                         "movdqa     %2, %3\n"
-                         
-                         "palignr    $1, %1, %2\n"
-                         "pandn      %1, %2\n"
-                         "pmovmskb   %2, %5\n"
-                         : "=r" (text), "=x" (curr), "=x" (tmp), "=x" (next), "=x" (spaces), "=r" (a)
-                         : "0" (text), "1" (curr), "2" (tmp), "3" (next), "4" (spaces), "5" (a)
+                         "movdqa     (%0), %1\n" // next = text
+                         "pcmpeqb    %2, %1\n" // next ^= spaces
+                         : "=r" (text),"=x" (next), "=x" (spaces)
+                         : "0" (text), "1" (next), "2" (spaces)
                          : "memory", "cc"
                          );
-        result += __builtin_popcount(a);
+        
+        for (; length >= 32; length -= 16) {
+            int32_t a;
+            __asm__ volatile(
+                             "add        $16,  %0\n" // сдвиг
+                             "movdqa     %3, %1\n" // curr = next
+                             "movdqa     (%0), %2\n" // tmp = text
+                             
+                             "pcmpeqb    %4, %2\n" // tmp ^= spaces
+                             "movdqa     %2, %3\n" // next = tmp
+                             
+                             "palignr    $1, %1, %2\n" // tmp = shift 1 tmp cur
+                             "pandn      %1, %2\n" // tmp = !tmp & curr
+                             "pmovmskb   %2, %5\n" // a = pack tmp
+                             : "=r" (text), "=x" (curr), "=x" (tmp), "=x" (next), "=x" (spaces), "=r" (a)
+                             : "0" (text), "1" (curr), "2" (tmp), "3" (next), "4" (spaces), "5" (a)
+                             : "memory", "cc"
+                             );
+            result += __builtin_popcount(a);
+        }
     }
-    return result + simple_count(text, size, false);
+    
+    std::cout << text << " " << result << std::endl;
+    return result + simple_count(text + 1, length - 1, (text[0] == ' '));
 }
 
 int main() {
-    std::string str = "  hthpfc ethth   d e a v                                fef                 ";
+    std::string str = " fff hthpfc ethth   d e a v gergreg        gerge       ferfef    gtgtgr         ";
     auto begin = std::clock();
     std::cout << count_simple(str) << " time: " << std::clock() - begin << std::endl;
     begin = std::clock();
